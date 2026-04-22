@@ -1,4 +1,8 @@
 <?php
+// Do not load directly. 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Utility methods

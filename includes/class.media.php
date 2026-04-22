@@ -1,4 +1,9 @@
 <?php
+// Do not load directly. 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 require_once 'class.base.php';
 
 /**

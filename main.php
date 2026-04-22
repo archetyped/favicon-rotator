@@ -9,5 +9,10 @@ Author URI: http://archetyped.com
 Text Domain: favicon-rotator
 */
 
+// Do not load directly. 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 require_once 'model.php';
 $fvrt = new FaviconRotator();

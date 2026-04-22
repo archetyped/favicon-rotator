@@ -263,7 +263,7 @@ class FVRT_Media extends FVRT_Base {
 			/* Send image data to main post edit form and close popup */
 			//Get Attachment ID
 			$args = new stdClass();
-			$args->id = esc_attr( $this->util->array_key_first( $_POST[ $this->var_setmedia ] ) );
+			$args->id = $this->util->array_key_first( $_POST[ $this->var_setmedia ] );
 			//Make sure post is valid
 			if ( wp_attachment_is_image($args->id) ) {
 				$p = $this->get_request_props();
@@ -280,20 +280,18 @@ class FVRT_Media extends FVRT_Base {
 				}
 			}
 			
-			//Build JS Arguments string
-			$arg_string = array();
-			foreach ( (array)$args as $key => $val ) {
-				$arg_string[] = "'$key':'$val'";
-			}
-			$arg_string = '{' . implode(',', $arg_string) . '}';
+			// Build JS output.
+			ob_start();
 			?>
-			<script type="text/javascript">
-			/* <![CDATA[ */
-			var win = window.dialogArguments || opener || parent || top;
-			win.fvrt.media.setIcon(<?php echo $arg_string; ?>);
-			/* ]]> */
+			<script>
+			( function() {
+				var win = window.dialogArguments || opener || parent || top;
+				win.fvrt.media.setIcon( <?php echo wp_json_encode( $args, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES | JSON_FORCE_OBJECT ) ?> );
+			}() );
 			</script>
 			<?php
+			// Output inline JS.
+			wp_print_inline_script_tag( wp_remove_surrounding_empty_script_tags( ob_get_clean() ) );
 			exit;
 		}
 		

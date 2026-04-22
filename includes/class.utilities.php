@@ -456,20 +456,24 @@ class FVRT_Utilities {
 	}
 	
 	/**
-	 * Builds attribute string for HTML element
-	 * @param array $attr Attributes
-	 * @return string Formatted attribute string
+	 * Builds attribute string for HTML element.
+	 * @param array $attrs Attributes.
+	 * @return string Formatted attribute string.
 	 */
-	function build_attribute_string($attr) {
+	function build_attribute_string($attrs) {
 		$ret = '';
-		if ( is_object($attr) )
-			$attr = (array) $attr;
-		if ( is_array($attr) ) {
-			array_map('esc_attr', $attr);
+		// Convert object to array.
+		if ( is_object($attrs) ) {
+			$attrs = (array) $attrs;
+		}
+		// Convert array to string of attributes and values.
+		if ( is_array($attrs) ) {
 			$attr_str = array();
-			foreach ( $attr as $key => $val ) {
-				$attr_str[] = $key . '="' . $val . '"';
+			// Build as array of strings.
+			foreach ( $attrs as $key => $val ) {
+				$attr_str[] = sprintf('%1$s="%2$s"', esc_attr($key), esc_attr($val));
 			}
+			// Merge strings into single string.
 			$ret = implode(' ', $attr_str);
 		}
 		return $ret;

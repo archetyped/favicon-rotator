@@ -155,7 +155,7 @@ class FVRT_Utilities {
 	function get_file_extension($file) {
 		$ret = '';
 		$sep = '.';
-		if ( is_string($icon) && ( $rpos = strrpos($file, $sep) ) !== false ) 
+		if ( is_string($file) && ( $rpos = strrpos($file, $sep) ) !== false ) 
 			$ret = substr($file, $rpos + 1);
 		return $ret;
 	}

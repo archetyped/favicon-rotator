@@ -414,7 +414,15 @@ class FaviconRotator extends FVRT_Base {
 		//Display icon
 		if ( !is_null($icon) ) {
 			$t = $this->get_icon_type($type);
-			echo sprintf($t->display, $icon) . "\r\n";
+			$out = sprintf( $t->display, esc_url( $icon ) ); 
+			$allowed_tags = [
+				'link' => [
+					'rel' => true,
+					'href' => true,
+				],
+			];
+
+			echo wp_kses( $out, $allowed_tags ) . "\r\n";
 		}
 		
 		//Update icons array (if necessary)

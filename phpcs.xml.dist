@@ -24,9 +24,9 @@
     <config name="testVersion" value="8.3-"/>
     <rule ref="PHPCompatibilityWP"/>
     
-    <!-- <rule ref="WordPress-Core"/>
-    <rule ref="WordPress-Docs"/>
-    <rule ref="WordPress.WP.I18n"/> -->
+    <rule ref="WordPress-Core"/>
+    <!-- <rule ref="WordPress-Docs"/> -->
+    <!-- <rule ref="WordPress.WP.I18n"/> -->
     <config name="text_domain" value="favicon-rotator,default"/>
 
 	<!-- Sanitized Input rules -->
@@ -78,6 +78,7 @@
         <exclude name="Squiz.PHP.DisallowSizeFunctionsInLoops.Found"/>
         <exclude name="Squiz.PHP.NonExecutableCode.Unreachable"/>
         <exclude name="Squiz.Strings.DoubleQuoteUsage.NotRequired"/>
+        <exclude name="Universal.WhiteSpace.DisallowInlineTabs.NonIndentTabsUsed"/>
         <!-- ** Spacing-Related ** -->
         <exclude name="Generic.Formatting.SpaceAfterCast.NoSpace"/>
         <exclude name="Generic.Functions.FunctionCallArgumentSpacing.NoSpaceAfterComma"/>
@@ -97,6 +98,7 @@
         <exclude name="Squiz.Strings.ConcatenationSpacing.PaddingFound"/>
         <exclude name="Squiz.WhiteSpace.SemicolonSpacing.Incorrect"/>
         <exclude name="Squiz.WhiteSpace.SuperfluousWhitespace.EmptyLines"/>
+        <exclude name="Squiz.WhiteSpace.SuperfluousWhitespace.EndLine"/>
         <exclude name="WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound"/>
         <exclude name="WordPress.Arrays.ArrayDeclarationSpacing.NoSpaceAfterArrayOpener"/>
         <exclude name="WordPress.Arrays.ArrayDeclarationSpacing.NoSpaceBeforeArrayCloser"/>
@@ -124,6 +126,33 @@
         <exclude name="PSR2.Methods.MethodDeclaration.Underscore"/>
         <exclude name="PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.Changed"/>
         <exclude name="PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection"/>
+        <exclude name="Generic.CodeAnalysis.AssignmentInCondition.Found"/>
+        <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.Found"/>
+        <exclude name="Generic.Files.OneObjectStructurePerFile.MultipleFound"/>
+        <exclude name="Modernize.FunctionCalls.Dirname.FileConstant"/>
+        <exclude name="NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine"/>
+        <exclude name="NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine"/>
+        <exclude name="NormalizedArrays.Arrays.CommaAfterLast.MissingMultiLine"/>
+        <exclude name="PSR2.Files.EndFileNewline.NoneFound"/>
+        <exclude name="PSR2.Methods.FunctionClosingBrace.SpacingBeforeClose"/>
+        <exclude name="Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingBeforeClose"/>
+        <exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames.classFound"/>
+        <exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames.defaultFound"/>
+        <exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames.functionFound"/>
+        <exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames.parentFound"/>
+        <exclude name="Universal.Operators.StrictComparisons.LooseEqual"/>
+        <exclude name="Universal.Operators.StrictComparisons.LooseNotEqual"/>
+        <exclude name="Universal.WhiteSpace.PrecisionAlignment.Found"/>
+        <exclude name="WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace"/>
+        <exclude name="WordPress.PHP.DevelopmentFunctions.error_log_var_dump"/>
+        <exclude name="WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterStructureOpen"/>
+        <exclude name="WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeOpenParenthesis"/>
+        <exclude name="Generic.WhiteSpace.ScopeIndent.Incorrect"/>
+        <exclude name="Squiz.PHP.EmbeddedPhp.ContentAfterOpen"/>
+        <exclude name="Squiz.PHP.EmbeddedPhp.NoSemicolon"/>
+        <exclude name="WordPress.Arrays.ArrayKeySpacingRestrictions.SpacesAroundArrayKeys"/>
+        <exclude name="WordPress.WP.EnqueuedResourceParameters.MissingVersion"/>
+        <exclude name="WordPress.WP.EnqueuedResourceParameters.NotInFooter"/>
         <!-- ** WordPress-Specific ** -->
         <exclude name="WordPress.Security.NonceVerification.Missing"/>
         <!-- <exclude name="WordPress.Security.NonceVerification.Recommended"/> -->

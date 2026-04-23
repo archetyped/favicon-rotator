@@ -728,7 +728,7 @@ class FVRT_Media extends FVRT_Base {
 	 * @param bool $formatted (optional) Whether or not filesize should be formatted (kb/mb, etc.) (Default: TRUE)
 	 */
 	function the_attachment_filesize($post = null, $formatted = true) {
-		echo $this->get_attachment_filesize($post, $formatted);
+		echo esc_html( $this->get_attachment_filesize( $post, $formatted ) );
 	}
 	
 	/**

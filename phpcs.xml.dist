@@ -62,7 +62,6 @@
         <!-- ** Standard ** -->
         <exclude name="Generic.CodeAnalysis.ForLoopWithTestFunctionCall.NotAllowed"/>
         <exclude name="Generic.ControlStructures.InlineControlStructure.NotAllowed"/>
-        <exclude name="Generic.Files.EndFileNewline.NotFound"/>
         <exclude name="Generic.Files.LineEndings.InvalidEOLChar"/>
         <exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
         <exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
@@ -70,7 +69,6 @@
         <exclude name="PSR2.Classes.PropertyDeclaration.ScopeMissing"/>
         <exclude name="PSR2.Classes.PropertyDeclaration.VarUsed"/>
         <exclude name="PSR2.ControlStructures.SwitchDeclaration.TerminatingComment"/>
-        <exclude name="PSR2.Files.ClosingTag.NotAllowed"/>
         <exclude name="Squiz.Operators.IncrementDecrementUsage.NoBrackets"/>
         <exclude name="Squiz.PHP.CommentedOutCode.Found"/>
         <exclude name="Squiz.PHP.DisallowMultipleAssignments.Found"/>
@@ -133,7 +131,6 @@
         <exclude name="NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine"/>
         <exclude name="NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine"/>
         <exclude name="NormalizedArrays.Arrays.CommaAfterLast.MissingMultiLine"/>
-        <exclude name="PSR2.Files.EndFileNewline.NoneFound"/>
         <exclude name="PSR2.Methods.FunctionClosingBrace.SpacingBeforeClose"/>
         <exclude name="Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingBeforeClose"/>
         <exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames.classFound"/>
@@ -160,6 +157,7 @@
         <exclude name="WordPress.DB.PreparedSQL.NotPrepared"/>
         <exclude name="WordPress.PHP.DontExtract.extract_extract"/>
         <!-- <exclude name="WordPress.Security.EscapeOutput.OutputNotEscaped"/> -->
+        <exclude name="WordPress.Security.ValidatedSanitizedInput.MissingUnslash"/>
     </rule>
 
     <!-- Add in some extra rules from other standards. -->

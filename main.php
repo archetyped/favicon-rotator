@@ -1,13 +1,20 @@
 <?php
-/* 
-Plugin Name: Favicon Rotator
-Plugin URI: http://archetyped.com/tools/favicon-rotator/
-Description: Easily set site favicon and even rotate through multiple icons
-Version: 0.0.0-dev
-Author: Archetyped
-Author URI: http://archetyped.com
-Text Domain: favicon-rotator
+/**
+ * Favicon Rotator
+ *
+ * @package Favicon Rotator
+ * @author Archetyped <support@archetyped.com>
+ * @copyright 2026 Archetyped
+ *
+ * Plugin Name: Favicon Rotator
+ * Plugin URI: http://archetyped.com/tools/favicon-rotator/
+ * Description: Easily set site favicon and even rotate through multiple icons
+ * Version: 0.0.0-dev
+ * Author: Archetyped
+ * Author URI: http://archetyped.com
+ * Text Domain: favicon-rotator
 */
+
 
 // Do not load directly. 
 if ( ! defined( 'ABSPATH' ) ) {

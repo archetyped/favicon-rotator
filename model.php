@@ -505,7 +505,7 @@ class FaviconRotator extends FVRT_Base {
 				esc_url( $this->media->get_upload_iframe_src( 'image', $upload_args ) ), /* URL */
 				esc_attr( $class ), /* class */
 				esc_attr__( $t->lbl_add, 'favicon-rotator' ), /* title */
-				esc_html__( $t->lbl_add, 'favicon-rotator' ), /* content */	
+				esc_html__( $t->lbl_add, 'favicon-rotator' ) /* content */	
 			);
 		?>
 			<h3><?php esc_html_e( $t->lbl_title, 'favicon-rotator' ); ?> <?php echo $upload_link_escaped; ?></h3>

@@ -931,7 +931,4 @@ class FVRT_Media extends FVRT_Base {
 	function clear_type_current() {
 		$this->type_current = null;
 	}
-		
-		
 }
-?>

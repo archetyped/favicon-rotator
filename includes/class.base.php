@@ -183,5 +183,3 @@ class FVRT_Base {
 		return $wpdb->prefix . $this->get_prefix('_');
 	}
 }
-
-?>

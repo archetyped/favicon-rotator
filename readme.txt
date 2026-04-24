@@ -51,6 +51,15 @@ No upgrade notices
 
 == Changelog ==
 
+= 1.2.12 =
+
+* Fix: Undefined variable reference
+* Fix: Sanitized values unsaved
+* Update: Confirm WordPress 6.5/6.6 compatibility
+* Optimize: Integrate core WordPress functions
+* Optimize: Audit sanitized values
+* Optimize: WPCS cleanup
+
 = 1.2.11 =
 
 * Optimize: WordPress 6.4 Compatibility

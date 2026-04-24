@@ -118,7 +118,7 @@ class FVRT_Media extends FVRT_Base {
 	 */
 	function add_intermediate_image_size($sizes) {
 		$p = $this->get_request_props();
-		if ( !!$p && $p->width && $p->height ) {
+		if ( (bool)$p && $p->width && $p->height ) {
 			$crop = true;
 			add_image_size($p->type_name, $p->width, $p->height, $crop);
 			$sizes[] = $p->type_name;
@@ -148,7 +148,7 @@ class FVRT_Media extends FVRT_Base {
 		if ( $this->is_custom_media() ) {
 			$p = $this->get_request_props();
 			$filetypes = '*.' . implode(';*.', $p->file_type);
-			$types = esc_js($filetypes) . '",file_types_description: "' . esc_js(__($p->file_desc));
+			$types = esc_js($filetypes) . '",file_types_description: "' . esc_js( __( $p->file_desc, 'favicon-rotator' ) );
 		}
 		return $types;
 	}
@@ -159,7 +159,7 @@ class FVRT_Media extends FVRT_Base {
 			$qv =& $q->query_vars;
 			$p = $this->get_request_props();
 			//Set GET variable when single mime type specified (for future queries)
-			if ( !!$p && isset($p->file_mime) && is_array($p->file_mime) )
+			if ( (bool)$p && isset($p->file_mime) && is_array($p->file_mime) )
 				$qv[$var] = $p->file_mime;
 		}
 	}
@@ -173,7 +173,7 @@ class FVRT_Media extends FVRT_Base {
 	function upload_url($url, $type = null) {
 		$args = ( is_array($type) ) ? $type : array();
 		$custom = ( ( is_string($type) && 0 === strpos($type, $this->add_prefix('')) ) || !empty($args) ) ? true : $this->is_custom_media($url);
-		$p = parse_url($url);
+		$p = wp_parse_url($url);
 		$p = basename( ( isset($p['path']) ) ? $p['path'] : $url );
 		if ( strpos($p, 'media-upload.php') === 0 && $custom ) {
 			$defaults = array(
@@ -268,7 +268,7 @@ class FVRT_Media extends FVRT_Base {
 			/* Send image data to main post edit form and close popup */
 			//Get Attachment ID
 			$args = new stdClass();
-			$args->id = $this->util->array_key_first( $_POST[ $this->var_setmedia ] );
+			$args->id = sanitize_key( $this->util->array_key_first( $_POST[ $this->var_setmedia ] ) );
 			//Make sure post is valid
 			if ( wp_attachment_is_image($args->id) ) {
 				$p = $this->get_request_props();
@@ -302,7 +302,8 @@ class FVRT_Media extends FVRT_Base {
 		
 		//Handle HTML upload
 		if ( isset($_POST['html-upload']) && !empty($_FILES) ) {
-			$id = media_handle_upload('async-upload', $_REQUEST['post_id']);
+			$post_id = isset( $_REQUEST[ 'post_id' ] ) ? sanitize_key( $_REQUEST[ 'post_id' ] ) : 0;
+			$id = media_handle_upload( 'async-upload', $post_id );
 			//Clear uploaded files
 			unset($_FILES);
 			if ( is_wp_error($id) ) {
@@ -314,7 +315,7 @@ class FVRT_Media extends FVRT_Base {
 		//Display default UI
 					
 		//Determine media type
-		$type = ( isset($_REQUEST['type']) ) ? esc_attr( $_REQUEST['type'] ) : $this->var_type;
+		$type = ( isset($_REQUEST['type']) ) ? sanitize_text_field( $_REQUEST['type'] ) : $this->var_type;
 		//Determine UI to use (disk or URL upload)
 		$upload_form = ( isset($_GET['tab']) && 'type_url' == $_GET['tab'] ) ? 'media_upload_type_url_form' : 'media_upload_type_form';
 		//Load UI
@@ -353,7 +354,8 @@ class FVRT_Media extends FVRT_Base {
 						__( 'Manage PNG Images', 'favicon-rotator' ),
 						_n_noop(
 							'PNG Image <span class="count">(%s)</span>',
-							'PNG Images <span class="count">(%s)</span>'
+							'PNG Images <span class="count">(%s)</span>',
+							'favicon-rotator'
 						),
 					),
 					'image/gif'    => array(
@@ -361,7 +363,8 @@ class FVRT_Media extends FVRT_Base {
 						__( 'Manage GIF Images', 'favicon-rotator' ),
 						_n_noop(
 							'GIF Image <span class="count">(%s)</span>',
-							'GIF Images <span class="count">(%s)</span>'
+							'GIF Images <span class="count">(%s)</span>',
+							'favicon-rotator'
 						),
 					),
 					'image/jpeg'   => array(
@@ -369,7 +372,8 @@ class FVRT_Media extends FVRT_Base {
 						__( 'Manage JPG Images', 'favicon-rotator' ),
 						_n_noop(
 							'JPG Image <span class="count">(%s)</span>',
-							'JPG Images <span class="count">(%s)</span>'
+							'JPG Images <span class="count">(%s)</span>',
+							'favicon-rotator'
 						),
 					),
 					'image/x-icon' => array(
@@ -377,7 +381,8 @@ class FVRT_Media extends FVRT_Base {
 						__( 'Manage ICO Images', 'favicon-rotator' ),
 						_n_noop(
 							'ICO Image <span class="count">(%s)</span>',
-							'ICO Images <span class="count">(%s)</span>'
+							'ICO Images <span class="count">(%s)</span>',
+							'favicon-rotator'
 						),
 					),
 				);
@@ -454,7 +459,7 @@ class FVRT_Media extends FVRT_Base {
 				}
 				
 				//Add "Set as Image" button (if valid attachment type)
-				$set_as = __( ( isset($q->lbl_set) ) ? $q->lbl_set : 'Set Media' );
+				$set_as = __( ( isset($q->lbl_set) ) ? $q->lbl_set : 'Set Media', 'favicon-rotator' );
 				$field_name = sprintf('%1$s[%2$s]', $this->var_setmedia, $post->ID);
 				$field_html = $this->util->build_input_element('submit', $field_name, $set_as, array('class' => 'button'));
 				$field = array(
@@ -488,14 +493,15 @@ class FVRT_Media extends FVRT_Base {
 		if ( is_string($url) && !empty($url) )
 			$u = $url;
 		//Use referrer for async uploads
-		elseif ( 'async-upload' == basename($_SERVER['SCRIPT_NAME'], '.php') )
+		elseif ( 'async-upload' == basename( sanitize_text_field( $_SERVER['SCRIPT_NAME'] ?? '' ), '.php') )
 			$u = wp_get_referer();
 		
 		if ( !is_null($u) ) {
 			//Parse referrer
-			$u = parse_url($u);
-			if ( isset($u['query']) )
-				parse_str($u['query'], $q);
+			$qstring = wp_parse_url( $u, PHP_URL_QUERY );
+			if ( !empty($qstring) ) {
+				wp_parse_str( $qstring, $q );
+			}
 		} else {
 			$q = $_REQUEST;
 		}
@@ -537,7 +543,7 @@ class FVRT_Media extends FVRT_Base {
 		//Retrieve curren type as callback
 		if ( empty($p) ) {
 			$p = $this->get_type_current();
-			if ( !!$p )
+			if ( (bool)$p )
 				$p = get_object_vars($p);
 		}
 			
@@ -805,7 +811,7 @@ class FVRT_Media extends FVRT_Base {
 		$icon = !wp_attachment_is_image($media->ID);
 		
 		//Get image properties
-		$attr = wp_parse_args($attr, array('alt' => trim(strip_tags( $media->post_excerpt ))));
+		$attr = wp_parse_args($attr, array('alt' => trim(wp_strip_all_tags( $media->post_excerpt ))));
 		list($attr['src'], $attribs['width'], $attribs['height']) = wp_get_attachment_image_src($media->ID, '', $icon);
 			
 		switch ( $type ) {

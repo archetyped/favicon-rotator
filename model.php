@@ -343,7 +343,7 @@ class FaviconRotator extends FVRT_Base {
 			foreach ( $this->get_icon_type_names() as $itype ) {
 				$field = $field_base . $itype;
 				if ( isset($_POST[$field]) ) { 
-					$icons[$itype] = explode( ',', esc_attr( $_POST[$field] ) );
+					$icons[$itype] = explode( ',', sanitize_text_field( $_POST[$field] ) );
 				}
 			}
 		}
@@ -481,6 +481,7 @@ class FaviconRotator extends FVRT_Base {
 		$class = "button thickbox fv_btn";
 		//Setup query arguments
 		$filter = array('limit', 'lbl_title', 'lbl_add', 'lbl_empty', 'display');
+		$form_action = sanitize_url( $_SERVER[ 'REQUEST_URI' ] ?? '' );
 		$upload_args_base = array_diff(array_keys($this->icon_type_default_properties), $filter);
 		$upload_args_base[] = 'type_name';
 		$upload_args_map = array();
@@ -491,7 +492,7 @@ class FaviconRotator extends FVRT_Base {
 		?>
 	<div class="wrap">
 		<h2><?php esc_html_e( 'Favicon Rotator', 'favicon-rotator' ); ?></h2>
-		<form method="post" action="<?php echo esc_url( $_SERVER[ 'REQUEST_URI' ] ); ?>">
+		<form method="post" action="<?php echo esc_url( $form_action ); ?>">
 		<?php foreach ( $this->get_icon_types() as $tname => $t ) : /* Output UI for icon types */ 
 			$icons = $this->get_icons( $t->type_name );
 			$upload_args = array();
@@ -503,8 +504,8 @@ class FaviconRotator extends FVRT_Base {
 				'<a href="%1$s" class="%2$s" title="%3$s">%4$s</a>',
 				esc_url( $this->media->get_upload_iframe_src( 'image', $upload_args ) ), /* URL */
 				esc_attr( $class ), /* class */
-				esc_attr( $t->lbl_add, 'favicon-rotator' ), /* title */
-				esc_html( $t->lbl_add, 'favicon-rotator' ), /* content */	
+				esc_attr__( $t->lbl_add, 'favicon-rotator' ), /* title */
+				esc_html__( $t->lbl_add, 'favicon-rotator' ), /* content */	
 			);
 		?>
 			<h3><?php esc_html_e( $t->lbl_title, 'favicon-rotator' ); ?> <?php echo $upload_link_escaped; ?></h3>

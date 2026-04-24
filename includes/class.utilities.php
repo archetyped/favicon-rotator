@@ -67,7 +67,11 @@ class FVRT_Utilities {
 	 * @return bool TRUE if current page matches specified filename, FALSE otherwise
 	 */
 	function is_file( $filename ) {
-		return ( $filename == basename( $_SERVER['SCRIPT_NAME'] ) );
+		// Sanity check.
+		if ( !is_string( $filename ) || empty( $filename ) || !isset( $_SERVER[ 'SCRIPT_NAME'] ) ) {
+			return false;
+		}
+		return ( $filename == basename( sanitize_text_field( $_SERVER['SCRIPT_NAME'] ) ) );
 	}
 	
 	/**
@@ -214,34 +218,34 @@ class FVRT_Utilities {
 	 * @return string Current action
 	 */
 	function get_action($default = null) {
-		$action = '';
+		// Retrieve action from URL.
+		$action = isset( $_GET[ 'action' ] ) ? sanitize_text_field( $_GET[ 'action' ] ) : '';
 		
-		//Check if action is set in URL
-		if ( isset($_GET['action']) ) {
-			$action = esc_attr( $_GET['action'] );
+		// Determine action based on plugin plugin admin page suffix.
+		if ( empty( $action ) && isset( $_GET[ 'page' ] ) ) {
+			$page = sanitize_text_field( $_GET[ 'page' ] );
+			$suffix_pos = strrpos( $page, '-' );
+			if ( $suffix_pos !== false && ( $suffix_pos != strlen( $page ) - 1 ) ) {
+				$action = trim( substr( $page, $suffix_pos + 1 ), '-_' );
+			}
 		}
-		//Otherwise, Determine action based on plugin plugin admin page suffix
-		elseif ( isset($_GET['page']) && ($pos = strrpos($_GET['page'], '-')) && $pos !== false && ( $pos != count($_GET['page']) - 1 ) )
-			$action = trim( esc_attr( substr( $_GET['page'], $pos + 1 ) ), '-_');
 
-		//Determine action for core admin pages
-		if ( ! isset($_GET['page']) || empty($action) ) {
+		// Determine action for core admin pages.
+		if ( empty( $action ) && isset( $_SERVER[ 'SCRIPT_NAME' ] ) ) {
+			$page = basename( sanitize_text_field( $_SERVER['SCRIPT_NAME'] ), '.php' ); 
 			$actions = array(
 				'add'			=> array('page-new', 'post-new'),
 				'edit-item'		=> array('page', 'post'),
 				'edit'			=> array('edit', 'edit-pages')
 			);
-			$page = basename($_SERVER['SCRIPT_NAME'], '.php');
-			
-			foreach ( $actions as $act => $pages ) {
-				if ( in_array($page, $pages) ) {
-					$action = $act;
-					break;
-				}
-			}
+			$action = array_find_key( $actions, function ( $pages ) use ( $page ) {
+				return in_array( $page, $pages );
+			});
 		}
-		if ( empty($action) )
+		// Fallback: Default action.
+		if ( empty($action) ) {
 			$action = $default;
+		}
 		return $action;
 	}
 	

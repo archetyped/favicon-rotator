@@ -1,10 +1,12 @@
 === Favicon Rotator ===
 Contributors: Archetyped
-Donate link: http://mycharitywater.org/archetyped-2012-fall
+Donate link: http://gum.co/slb-donate
 Tags: favicon, icon, image, mobile, customization
-Requires at least: 5.4
+Requires at least: 6.6
 Tested up to: 6.6
-Stable tag: 1.2.11
+Requires PHP: 8.2
+Stable tag: 1.2.12
+
 
 Easily set site favicon and even rotate through multiple icons
 

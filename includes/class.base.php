@@ -1,4 +1,8 @@
 <?php
+// Do not load directly. 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 require_once 'class.utilities.php';
 
@@ -40,11 +44,7 @@ class FVRT_Base {
 	 * To be overriden by child classes
 	 */
 	function init() {
-		$func = 'register_hooks';
-		if ( isset($this) ) {
-			if ( method_exists($this, $func) )
-				call_user_method($func, $this);
-		}
+		$this->register_hooks();
 	}
 	
 	function register_hooks() {
@@ -103,7 +103,7 @@ class FVRT_Base {
 	 * @return boolean Result of operation
 	 */
 	function post_meta_add($post_id, $meta_key, $meta_value, $unique = false) {
-		$meta_value = $this->post_meta_value_prepare($meta_value);
+		$meta_value = $this->post_meta_prepare_value($meta_value);
 		return add_post_meta($post_id, $meta_key, $meta_value, $unique);
 	}
 	
@@ -179,5 +179,3 @@ class FVRT_Base {
 		return $wpdb->prefix . $this->get_prefix('_');
 	}
 }
-
-?>

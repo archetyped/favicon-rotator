@@ -1,4 +1,8 @@
 <?php
+// Do not load directly. 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Utility methods
@@ -63,7 +67,11 @@ class FVRT_Utilities {
 	 * @return bool TRUE if current page matches specified filename, FALSE otherwise
 	 */
 	function is_file( $filename ) {
-		return ( $filename == basename( $_SERVER['SCRIPT_NAME'] ) );
+		// Sanity check.
+		if ( !is_string( $filename ) || empty( $filename ) || !isset( $_SERVER[ 'SCRIPT_NAME'] ) ) {
+			return false;
+		}
+		return ( $filename == basename( sanitize_text_field( $_SERVER['SCRIPT_NAME'] ) ) );
 	}
 	
 	/**
@@ -151,7 +159,7 @@ class FVRT_Utilities {
 	function get_file_extension($file) {
 		$ret = '';
 		$sep = '.';
-		if ( is_string($icon) && ( $rpos = strrpos($file, $sep) ) !== false ) 
+		if ( is_string($file) && ( $rpos = strrpos($file, $sep) ) !== false ) 
 			$ret = substr($file, $rpos + 1);
 		return $ret;
 	}
@@ -210,34 +218,34 @@ class FVRT_Utilities {
 	 * @return string Current action
 	 */
 	function get_action($default = null) {
-		$action = '';
+		// Retrieve action from URL.
+		$action = isset( $_GET[ 'action' ] ) ? sanitize_text_field( $_GET[ 'action' ] ) : '';
 		
-		//Check if action is set in URL
-		if ( isset($_GET['action']) ) {
-			$action = esc_attr( $_GET['action'] );
+		// Determine action based on plugin plugin admin page suffix.
+		if ( empty( $action ) && isset( $_GET[ 'page' ] ) ) {
+			$page = sanitize_text_field( $_GET[ 'page' ] );
+			$suffix_pos = strrpos( $page, '-' );
+			if ( $suffix_pos !== false && ( $suffix_pos != strlen( $page ) - 1 ) ) {
+				$action = trim( substr( $page, $suffix_pos + 1 ), '-_' );
+			}
 		}
-		//Otherwise, Determine action based on plugin plugin admin page suffix
-		elseif ( isset($_GET['page']) && ($pos = strrpos($_GET['page'], '-')) && $pos !== false && ( $pos != count($_GET['page']) - 1 ) )
-			$action = trim( esc_attr( substr( $_GET['page'], $pos + 1 ) ), '-_');
 
-		//Determine action for core admin pages
-		if ( ! isset($_GET['page']) || empty($action) ) {
+		// Determine action for core admin pages.
+		if ( empty( $action ) && isset( $_SERVER[ 'SCRIPT_NAME' ] ) ) {
+			$page = basename( sanitize_text_field( $_SERVER['SCRIPT_NAME'] ), '.php' ); 
 			$actions = array(
 				'add'			=> array('page-new', 'post-new'),
 				'edit-item'		=> array('page', 'post'),
 				'edit'			=> array('edit', 'edit-pages')
 			);
-			$page = basename($_SERVER['SCRIPT_NAME'], '.php');
-			
-			foreach ( $actions as $act => $pages ) {
-				if ( in_array($page, $pages) ) {
-					$action = $act;
-					break;
-				}
-			}
+			$action = array_find_key( $actions, function ( $pages ) use ( $page ) {
+				return in_array( $page, $pages );
+			});
 		}
-		if ( empty($action) )
+		// Fallback: Default action.
+		if ( empty($action) ) {
 			$action = $default;
+		}
 		return $action;
 	}
 	
@@ -369,11 +377,31 @@ class FVRT_Utilities {
 	 * Checks if item at specified path in array is set
 	 * @param array $arr Array to check for item
 	 * @param array $path Array of segments that form path to array (each array item is a deeper dimension in the array)
+	 * @param mixed $item Optional. Reference to variable to pass path value back to.
 	 * @return boolean TRUE if item is set in array, FALSE otherwise
 	 */
-	function array_item_isset(&$arr, &$path) {
-		$f_path = $this->get_array_path($path);
-		return eval('return isset($arr' . $f_path . ');');
+	function array_item_isset($arr, $path, &$item = null) {
+		// Basic validation.
+		if ( !is_array($arr) || !is_array($path) || empty($arr) || empty($path) ) {
+			return false;
+		}
+		// Validate path keys.
+		if ( !array_all( $path, fn($val, $key) => ( is_string($val) || is_int($val) ) ) ) {
+			return false;
+		}
+		// Check if path keys exist in array.
+		$base = &$arr;
+		foreach ( $path as $key ) {
+			// Stop if key not set.
+			if ( !isset( $base[$key] ) ) {
+				return false;
+			}
+			// Set new base for next iteration.
+			$base = &$base[$key];
+		}
+		// All checks passed.
+		$item = $base;
+		return true;
 	}
 	
 	/**
@@ -382,50 +410,13 @@ class FVRT_Utilities {
 	 * @param array $path Array of segments that form path to array (each array item is a deeper dimension in the array)
 	 * @return mixed Value of item in array (Default: empty string)
 	 */
-	function &get_array_item(&$arr, &$path) {
+	function get_array_item($arr, $path) {
 		$item = '';
-		if ($this->array_item_isset($arr, $path)) {
-			eval('$item =& $arr' . $this->get_array_path($path) . ';');
-		}
+		// Retrieve item.
+		$this->array_item_isset( $arr, $path, $item );
 		return $item;
 	}
-	
-	function get_array_path($attribute = '', $format = null) {
-		//Formatted value
-		$fmtd = '';
-		if (!empty($attribute)) {
-			//Make sure attribute is array
-			if (!is_array($attribute)) {
-				$attribute = array($attribute);
-			}
-			//Format attribute
-			$format = strtolower($format);
-			switch ($format) {
-				case 'id':
-					$fmtd = array_shift($attribute) . '[' . implode('][', $attribute) . ']';
-					break;
-				case 'metadata':
-				case 'attribute':
-					//Join segments
-					$delim = '_';
-					$fmtd = implode($delim, $attribute);
-					//Replace white space and repeating delimiters
-					$fmtd = str_replace(' ', $delim, $fmtd);
-					while (strpos($fmtd, $delim.$delim) !== false)
-						$fmtd = str_replace($delim.$delim, $delim, $fmtd);
-					//Prefix formatted value with delimeter for metadata keys
-					if ('metadata' == $format)
-						$fmtd = $delim . $fmtd;
-					break;
-				case 'path':
-				case 'post':
-				default:
-					$fmtd = '["' . implode('"]["', $attribute) . '"]';
-			}
-		}
-		return $fmtd;
-	}
-	
+		
 	/**
 	 * Builds array of path elements based on arguments
 	 * Each item in path array represents a deeper level in structure path is for (object, array, filesystem, etc.)
@@ -456,20 +447,24 @@ class FVRT_Utilities {
 	}
 	
 	/**
-	 * Builds attribute string for HTML element
-	 * @param array $attr Attributes
-	 * @return string Formatted attribute string
+	 * Builds attribute string for HTML element.
+	 * @param array $attrs Attributes.
+	 * @return string Formatted attribute string.
 	 */
-	function build_attribute_string($attr) {
+	function build_attribute_string($attrs) {
 		$ret = '';
-		if ( is_object($attr) )
-			$attr = (array) $attr;
-		if ( is_array($attr) ) {
-			array_map('esc_attr', $attr);
+		// Convert object to array.
+		if ( is_object($attrs) ) {
+			$attrs = (array) $attrs;
+		}
+		// Convert array to string of attributes and values.
+		if ( is_array($attrs) ) {
 			$attr_str = array();
-			foreach ( $attr as $key => $val ) {
-				$attr_str[] = $key . '="' . $val . '"';
+			// Build as array of strings.
+			foreach ( $attrs as $key => $val ) {
+				$attr_str[] = sprintf('%1$s="%2$s"', esc_attr($key), esc_attr($val));
 			}
+			// Merge strings into single string.
 			$ret = implode(' ', $attr_str);
 		}
 		return $ret;
@@ -719,7 +714,7 @@ class FVRT_Debug {
 		foreach (func_get_args() as $msg) {
 			echo '<pre>';
 			if (is_scalar($msg) && !is_bool($msg)) {
-				echo htmlspecialchars($msg) . "<br />";
+				echo esc_html( $msg ) . "<br />";
 			} else {
 				var_dump($msg);
 			}

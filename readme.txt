@@ -1,10 +1,13 @@
 === Favicon Rotator ===
 Contributors: Archetyped
-Donate link: http://mycharitywater.org/archetyped-2012-fall
-Tags: favicon,icon,template,theme,customization,simple,media,touch,ios,android
-Requires at least: 5.4
-Tested up to: 6.4
-Stable tag: trunk
+Donate link: http://gum.co/slb-donate
+License: GPLv2
+Tags: favicon, icon, image, mobile, customization
+Requires at least: 6.6
+Tested up to: 6.6
+Requires PHP: 8.2
+Stable tag: 1.2.12
+
 
 Easily set site favicon and even rotate through multiple icons
 
@@ -51,58 +54,83 @@ No upgrade notices
 
 == Changelog ==
 
+= 1.2.12 =
+
+* Fix: Undefined variable reference
+* Fix: Sanitized values unsaved
+* Update: Confirm WordPress 6.5/6.6 compatibility
+* Optimize: Integrate core WordPress functions
+* Optimize: Audit sanitized values
+* Optimize: WPCS cleanup
+
 = 1.2.11 =
+
 * Optimize: WordPress 6.4 Compatibility
 * Optimize: Data validation/formatting
 * Optimize: Internal code cleanup
 
 = 1.2.10 =
+
 * Optimize: WordPress 5.6 Compatibility
 
 = 1.2.9 =
+
 * Optimize: WordPress 5.5 Compatibility
 
 = 1.2.8 =
+
 * Optimize: WordPress 5.4 Compatibility
 
 = 1.2.7 =
+
 * Add: Text Domain plugin header (for translations)
 * Update: Use plugin-specific text domain for localized strings
 
 = 1.2.6 =
+
 * Update: WordPress compatibility (4.4)
 * Optimize: PHP standards
 
 = 1.2.5 =
+
 * Update: WordPress 3.8 support
 
 = 1.2.4 =
+
 * Update: WordPress 3.6 support
 * Optimize: Contextual help
 
 = 1.2.3 =
+
 * Optimize: Improved compatibility with WP media library
 
 = 1.2.2 =
+
 * Optimize: Improved PHP 5+ compatibility
 
 = 1.2.1 =
+
 * Add: WP 3.3 Support
 * Update: Remove references to deprecated functions
 
 = 1.2 =
+
 * Add: Support for setting Touch icon (iOS, Android, etc.)
 
 = 1.1.2 =
+
 * Updated: Utilities code (internal)
 
 = 1.1 =
+
 * Added: Generate icon file from uploaded images
 * Added: Settings link from plugins page
 * Optimized: File path resolution
 
 = 1.0.1 =
+
 * Fix: Various bugs
 
 = 1.0 =
+
 * Initial release

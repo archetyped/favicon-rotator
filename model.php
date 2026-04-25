@@ -1,4 +1,8 @@
 <?php 
+// Do not load directly. 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 require_once 'includes/class.base.php';
 require_once 'includes/class.media.php';
@@ -339,7 +343,7 @@ class FaviconRotator extends FVRT_Base {
 			foreach ( $this->get_icon_type_names() as $itype ) {
 				$field = $field_base . $itype;
 				if ( isset($_POST[$field]) ) { 
-					$icons[$itype] = explode( ',', esc_attr( $_POST[$field] ) );
+					$icons[$itype] = explode( ',', sanitize_text_field( $_POST[$field] ) );
 				}
 			}
 		}
@@ -410,7 +414,15 @@ class FaviconRotator extends FVRT_Base {
 		//Display icon
 		if ( !is_null($icon) ) {
 			$t = $this->get_icon_type($type);
-			echo sprintf($t->display, $icon) . "\r\n";
+			$out = sprintf( $t->display, esc_url( $icon ) ); 
+			$allowed_tags = [
+				'link' => [
+					'rel' => true,
+					'href' => true,
+				],
+			];
+
+			echo wp_kses( $out, $allowed_tags ) . "\r\n";
 		}
 		
 		//Update icons array (if necessary)
@@ -461,7 +473,7 @@ class FaviconRotator extends FVRT_Base {
 	 */
 	function admin_page() {
 		if ( ! current_user_can('edit_theme_options') )
-			wp_die(__('You do not have permission to customize favicons.', 'favicon-rotator'));
+			wp_die( esc_html__('You do not have permission to customize favicons.', 'favicon-rotator') );
 			
 		//Get saved icons
 		if ( isset($_POST['fv_submit']) )
@@ -469,6 +481,7 @@ class FaviconRotator extends FVRT_Base {
 		$class = "button thickbox fv_btn";
 		//Setup query arguments
 		$filter = array('limit', 'lbl_title', 'lbl_add', 'lbl_empty', 'display');
+		$form_action = sanitize_url( $_SERVER[ 'REQUEST_URI' ] ?? '' );
 		$upload_args_base = array_diff(array_keys($this->icon_type_default_properties), $filter);
 		$upload_args_base[] = 'type_name';
 		$upload_args_map = array();
@@ -478,43 +491,49 @@ class FaviconRotator extends FVRT_Base {
 		
 		?>
 	<div class="wrap">
-		<h2><?php _e('Favicon Rotator', 'favicon-rotator'); ?></h2>
-		<form method="post" action="<?php echo esc_attr($_SERVER['REQUEST_URI']); ?>">
+		<h2><?php esc_html_e( 'Favicon Rotator', 'favicon-rotator' ); ?></h2>
+		<form method="post" action="<?php echo esc_url( $form_action ); ?>">
 		<?php foreach ( $this->get_icon_types() as $tname => $t ) : /* Output UI for icon types */ 
-			$icons = $this->get_icons($t->type_name);
+			$icons = $this->get_icons( $t->type_name );
 			$upload_args = array();
 			foreach ( $upload_args_map as $param => $prop ) {
-				if ( isset($t->$prop) )
+				if ( isset( $t->$prop ) )
 					$upload_args[$param] = $t->$prop;
 			}
+			$upload_link_escaped = sprintf(
+				'<a href="%1$s" class="%2$s" title="%3$s">%4$s</a>',
+				esc_url( $this->media->get_upload_iframe_src( 'image', $upload_args ) ), /* URL */
+				esc_attr( $class ), /* class */
+				esc_attr__( $t->lbl_add, 'favicon-rotator' ), /* title */
+				esc_html__( $t->lbl_add, 'favicon-rotator' ) /* content */	
+			);
 		?>
-			<h3><?php _e($t->lbl_title); ?> <a href="<?php echo $this->media->get_upload_iframe_src('image', $upload_args); ?>" class="<?php echo esc_attr($class); ?>" title="<?php esc_attr_e($t->lbl_add); ?>"><?php echo esc_html_x($t->lbl_add, 'file')?></a></h3>
+			<h3><?php esc_html_e( $t->lbl_title, 'favicon-rotator' ); ?> <?php echo $upload_link_escaped; ?></h3>
 			<div class="fv_container">
-				<p id="fv_msg_empty_<?php echo $t->type_name; ?>"<?php if ( $icons ) echo ' style="display: none;"'?>><?php _e($t->lbl_empty); ?></p>
-				<ul id="fv_item_wrap_<?php echo $t->type_name; ?>" class="fv_item_wrap <?php echo ( is_null($t->limit) ) ? 'multi' : 'single'; ?>">
+				<p id="fv_msg_empty_<?php echo esc_attr( $t->type_name ); ?>"<?php if ( $icons ) echo ' style="display: none;"'?>><?php esc_html_e( $t->lbl_empty, 'favicon-rotator' ); ?></p>
+				<ul id="fv_item_wrap_<?php echo esc_attr( $t->type_name ); ?>" class="fv_item_wrap <?php echo ( is_null( $t->limit ) ) ? 'multi' : 'single'; ?>">
 				<?php foreach ( $icons as $icon ) : //List icons
-					$icon_srcs = $this->media->get_icon_src($icon->ID, $t->type_name);
-					$icon_src = array_shift($icon_srcs);
-					$icon_media = wp_get_attachment_image_src($icon->ID, 'full');
-					$src = array_shift($icon_media);
+					$icon_src = array_shift( $this->media->get_icon_src( $icon->ID, $t->type_name ) );
+					$icon_media = wp_get_attachment_image_src( $icon->ID, 'full' );
+					$src = array_shift( $icon_media );
 				?>
 					<li class="fv_item">
 						<div>
-							<img class="icon" src="<?php echo $icon_src; ?>" />
+							<img class="icon" src="<?php echo esc_url( $icon_src ); ?>" />
 							<div class="details">
-								<div class="name"><?php echo basename($src); ?></div>
+								<div class="name"><?php echo esc_html( basename( $src ) ); ?></div>
 								<div class="options">
-									<a href="#" id="<?php echo esc_attr('fv_id_' . $t->type_name . '_' . $icon->ID); ?>" class="remove">Remove</a>
+									<a href="#" id="<?php echo esc_attr( 'fv_id_' . $t->type_name . '_' . $icon->ID ); ?>" class="remove">Remove</a>
 								</div>
 							</div>
 						</div>
 					</li>
 				<?php endforeach; //End icon listing
-					unset($icon_srcs, $icon_src, $icon_media, $src);
+					unset( $icon_src, $icon_media, $src );
 				?>
 				</ul>
 				<div style="display: none">
-					<li id="fv_item_temp_<?php echo $t->type_name; ?>" class="fv_item">
+					<li id="fv_item_temp_<?php echo esc_attr( $t->type_name ); ?>" class="fv_item">
 						<div>
 							<img class="icon" src="" />
 							<div class="details">
@@ -527,10 +546,10 @@ class FaviconRotator extends FVRT_Base {
 					</li>
 				</div>
 			</div>
-			<input type="hidden" id="fv_id_<?php echo $t->type_name; ?>" name="fv_id_<?php echo $t->type_name; ?>" value="<?php echo esc_attr($this->get_icon_ids_list($t->type_name)); ?>" />
+			<input type="hidden" id="fv_id_<?php echo esc_attr( $t->type_name ); ?>" name="fv_id_<?php echo esc_attr( $t->type_name ); ?>" value="<?php echo esc_attr( $this->get_icon_ids_list( $t->type_name ) ); ?>" />
 		<?php endforeach; /* END UI for icon types */ ?>
-			<?php wp_nonce_field($this->action_save); ?>
-			<p class="submit"><input type="submit" class="button-primary" name="fv_submit" value="<?php esc_attr_e('Save Changes', 'favicon-rotator'); ?>" /></p>
+			<?php wp_nonce_field( $this->action_save ); ?>
+			<p class="submit"><input type="submit" class="button-primary" name="fv_submit" value="<?php esc_attr_e( 'Save Changes', 'favicon-rotator' ); ?>" /></p>
 		</form>
 	</div>
 	<?php 

@@ -377,11 +377,31 @@ class FVRT_Utilities {
 	 * Checks if item at specified path in array is set
 	 * @param array $arr Array to check for item
 	 * @param array $path Array of segments that form path to array (each array item is a deeper dimension in the array)
+	 * @param mixed $item Optional. Reference to variable to pass path value back to.
 	 * @return boolean TRUE if item is set in array, FALSE otherwise
 	 */
-	function array_item_isset(&$arr, &$path) {
-		$f_path = $this->get_array_path($path);
-		return eval('return isset($arr' . $f_path . ');');
+	function array_item_isset($arr, $path, &$item = null) {
+		// Basic validation.
+		if ( !is_array($arr) || !is_array($path) || empty($arr) || empty($path) ) {
+			return false;
+		}
+		// Validate path keys.
+		if ( !array_all( $path, fn($val, $key) => ( is_string($val) || is_int($val) ) ) ) {
+			return false;
+		}
+		// Check if path keys exist in array.
+		$base = &$arr;
+		foreach ( $path as $key ) {
+			// Stop if key not set.
+			if ( !isset( $base[$key] ) ) {
+				return false;
+			}
+			// Set new base for next iteration.
+			$base = &$base[$key];
+		}
+		// All checks passed.
+		$item = $base;
+		return true;
 	}
 	
 	/**
@@ -390,50 +410,13 @@ class FVRT_Utilities {
 	 * @param array $path Array of segments that form path to array (each array item is a deeper dimension in the array)
 	 * @return mixed Value of item in array (Default: empty string)
 	 */
-	function &get_array_item(&$arr, &$path) {
+	function get_array_item($arr, $path) {
 		$item = '';
-		if ($this->array_item_isset($arr, $path)) {
-			eval('$item =& $arr' . $this->get_array_path($path) . ';');
-		}
+		// Retrieve item.
+		$this->array_item_isset( $arr, $path, $item );
 		return $item;
 	}
-	
-	function get_array_path($attribute = '', $format = null) {
-		//Formatted value
-		$fmtd = '';
-		if (!empty($attribute)) {
-			//Make sure attribute is array
-			if (!is_array($attribute)) {
-				$attribute = array($attribute);
-			}
-			//Format attribute
-			$format = strtolower($format);
-			switch ($format) {
-				case 'id':
-					$fmtd = array_shift($attribute) . '[' . implode('][', $attribute) . ']';
-					break;
-				case 'metadata':
-				case 'attribute':
-					//Join segments
-					$delim = '_';
-					$fmtd = implode($delim, $attribute);
-					//Replace white space and repeating delimiters
-					$fmtd = str_replace(' ', $delim, $fmtd);
-					while (strpos($fmtd, $delim.$delim) !== false)
-						$fmtd = str_replace($delim.$delim, $delim, $fmtd);
-					//Prefix formatted value with delimeter for metadata keys
-					if ('metadata' == $format)
-						$fmtd = $delim . $fmtd;
-					break;
-				case 'path':
-				case 'post':
-				default:
-					$fmtd = '["' . implode('"]["', $attribute) . '"]';
-			}
-		}
-		return $fmtd;
-	}
-	
+		
 	/**
 	 * Builds array of path elements based on arguments
 	 * Each item in path array represents a deeper level in structure path is for (object, array, filesystem, etc.)

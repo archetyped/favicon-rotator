@@ -4,7 +4,7 @@ Donate link: http://gum.co/slb-donate
 License: GPLv2
 Tags: favicon, icon, image, mobile, customization
 Requires at least: 6.6
-Tested up to: 6.6
+Tested up to: 7.0
 Requires PHP: 8.2
 Stable tag: 1.2.12
 
@@ -41,7 +41,11 @@ Favicon Rotator makes it easy to customize the favicon for your site.  Just add 
 
 == Upgrade Notice ==
 
-No upgrade notices
+= 1.3.0 =
+Security hardening and code modernization.
+
+= 1.2.12 =
+Security-related fixes and minimum PHP version updated (8.2+)
 
 == Frequently Asked Questions ==
 
@@ -50,15 +54,29 @@ No upgrade notices
 == Screenshots ==
 
 1. Simple Administration
-1. Favicon submenu in Appearance menu
+2. Favicon submenu in Appearance menu
 
 == Changelog ==
+
+= 1.3.0 =
+
+* Update: Confirm WordPress 7.0 compatibility
+* Update: Reorder tabs in icon selection dialog
+* Update: Icon selection dialog loads Library tab by default
+* Optimize: Security hardening
+* Optimize: Admin page CSS styles
+* Optimize: Icon selection dialog CSS styles
+* Optimize: PHPCS/WPCS audit/conform
+* Optimize: Code modernization (PHP 8+)
+* Optimize: Internationalization normalization
+* Optimize: Internal code refactoring/cleanup
 
 = 1.2.12 =
 
 * Fix: Undefined variable reference
 * Fix: Sanitized values unsaved
 * Update: Confirm WordPress 6.5/6.6 compatibility
+* Update: PHP v8.2+ required
 * Optimize: Integrate core WordPress functions
 * Optimize: Audit sanitized values
 * Optimize: WPCS cleanup

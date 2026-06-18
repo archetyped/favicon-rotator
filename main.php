@@ -10,7 +10,7 @@
  * Plugin URI: http://archetyped.com/tools/favicon-rotator/
  * Description: Easily set site favicon and even rotate through multiple icons
  * License: GPLv2
- * Version: 1.2.12
+ * Version: 1.3.0
  * Requires at least: 6.6
  * Requires PHP: 8.2
  * Text Domain: favicon-rotator
@@ -20,7 +20,7 @@
 */
 
 
-// Do not load directly. 
+// Do not load directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }

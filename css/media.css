@@ -1,2 +1,8 @@
+/* Hide */
 #media-items .fvrt_data,
 .ml-submit { display: none !important; }
+
+/* Format*/
+#media-items .media-item {
+    overflow: hidden;
+}

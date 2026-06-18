@@ -52,9 +52,10 @@
 	opacity: 1;
 }
 
-.fv_btn {
+.button.fv_btn {
 	font-family: Georgia, "Times New Roman", Times, serif;
 	font-weight: normal;
+	vertical-align: middle;
 }
 
 .fv_container {

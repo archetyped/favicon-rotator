@@ -1,5 +1,5 @@
 <?php
-// Do not load directly. 
+// Do not load directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -7,175 +7,188 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once 'class.utilities.php';
 
 /**
+ * Base class.
+ *
  * @package Favicon Rotator
  * @author Archetyped
- *
  */
 class FVRT_Base {
-	
+
 	/**
-	 * Prefix for Cornerstone-related data (attributes, DB tables, etc.)
-	 * @var string
+	 * Prefix for plugin-related data (attributes, DB tables, etc.)
 	 */
-	var $prefix = 'fvrt';
-	
+	protected string $prefix = 'fvrt';
+
 	/**
 	 * Utilities instance
-	 * @var FVRT_Utilities
 	 */
-	var $util;
-	
-	/**
-	 * Debug instance
-	 * @var FVRT_Debug
-	 */
-	var $debug;
-	
+	protected FVRT_Utilities $util;
+
 	/**
 	 * Constructor
 	 */
-	function __construct() {
+	public function __construct() {
 		$this->util = new FVRT_Utilities();
-		$this->debug = new FVRT_Debug();
 	}
-	
+
 	/**
 	 * Default initialization method
 	 * To be overriden by child classes
 	 */
-	function init() {
+	public function init() {
 		$this->register_hooks();
 	}
-	
-	function register_hooks() {
-		//Activation
+
+	public function register_hooks() {
+		// Activation.
 		$func_activate = 'activate';
-		if ( method_exists($this, $func_activate) )
-			register_activation_hook($this->util->get_plugin_base_file(), $this->m($func_activate));
-		//Deactivation
+		if ( method_exists( $this, $func_activate ) ) {
+			register_activation_hook( $this->util->get_plugin_base_file(), $this->m( $func_activate ) );
+		}
+		// Deactivation.
 		$func_deactivate = 'deactivate';
-		if ( method_exists($this, $func_deactivate) )
-			register_deactivation_hook($this->util->get_plugin_base_file(), $this->m($func_deactivate));
+		if ( method_exists( $this, $func_deactivate ) ) {
+			register_deactivation_hook( $this->util->get_plugin_base_file(), $this->m( $func_deactivate ) );
+		}
 	}
-	
+
 	/**
 	 * Returns callback to instance method
+	 *
 	 * @param string $method Method name
+	 *
 	 * @return array Callback array
 	 */
-	function &m($method) {
-		return $this->util->m($this, $method);
+	public function &m( $method ) {
+		return $this->util->m( $this, $method );
 	}
-	
+
 	/**
 	 * Retrieves post metadata for internal methods
 	 * Metadata set internally is wrapped in an array so it is unwrapped before returned the retrieved value
-	 * @see get_post_meta()
+	 *
 	 * @param int $post_id Post ID
 	 * @param string $key Name of metadata to retrieve
 	 * @param boolean $single Whether or not to retrieve single value or not
+	 *
 	 * @return mixed Retrieved post metadata
+	 * @see get_post_meta()
 	 */
-	function post_meta_get($post_id, $key, $single = false) {
-		$meta_value = get_post_meta($post_id, $this->post_meta_get_key($key), $single);
-		if (is_array($meta_value) && count($meta_value) == 1)
+	public function post_meta_get( $post_id, $key, $single = false ) {
+		$meta_value = get_post_meta( $post_id, $this->post_meta_get_key( $key ), $single );
+		if ( is_array( $meta_value ) && count( $meta_value ) === 1 ) {
 			$meta_value = $meta_value[0];
+		}
 		return $meta_value;
 	}
-	
+
 	/**
 	 * Wraps metadata in array for storage in database
+	 *
 	 * @param mixed $meta_value Value to be set as metadata
+	 *
 	 * @return array Wrapped metadata value
 	 */
-	function post_meta_prepare_value($meta_value) {
-		return array($meta_value);
+	public function post_meta_prepare_value( $meta_value ) {
+		return array( $meta_value );
 	}
-	
+
 	/**
 	 * Adds Metadata for a post to database
 	 * For internal methods
-	 * @see add_post_meta
+	 *
 	 * @param $post_id
 	 * @param $meta_key
 	 * @param $meta_value
 	 * @param $unique
+	 *
 	 * @return boolean Result of operation
+	 * @see add_post_meta
 	 */
-	function post_meta_add($post_id, $meta_key, $meta_value, $unique = false) {
-		$meta_value = $this->post_meta_prepare_value($meta_value);
-		return add_post_meta($post_id, $meta_key, $meta_value, $unique);
+	public function post_meta_add( $post_id, $meta_key, $meta_value, $unique = false ) {
+		$meta_value = $this->post_meta_prepare_value( $meta_value );
+		return add_post_meta( $post_id, $meta_key, $meta_value, $unique );
 	}
-	
+
 	/**
 	 * Updates post metadata for internal data/methods
-	 * @see update_post_meta()
+	 *
 	 * @param $post_id
 	 * @param $meta_key
 	 * @param $meta_value
 	 * @param $prev_value
+	 *
 	 * @return boolean Result of operation
+	 * @see update_post_meta()
 	 */
-	function post_meta_update($post_id, $meta_key, $meta_value, $prev_value = '') {
-		$meta_value = $this->post_meta_prepare_value($meta_value);
-		return update_post_meta($post_id, $meta_key, $meta_value, $prev_value);
+	public function post_meta_update( $post_id, $meta_key, $meta_value, $prev_value = '' ) {
+		$meta_value = $this->post_meta_prepare_value( $meta_value );
+		return update_post_meta( $post_id, $meta_key, $meta_value, $prev_value );
 	}
-	
+
 	/**
-	 * Builds postmeta key for custom data set by plugin
-	 * @param string $key Base key name 
-	 * @return string Formatted postmeta key
+	 * Builds postmeta key for custom data set by plugin.
+	 * Format: `_{prefix}_{key}`.
+	 *
+	 * @param string $key Base key name.
+	 *
+	 * @return string Formatted postmeta key.
 	 */
-	function post_meta_get_key($key) {
+	public function post_meta_get_key( string $key ) {
 		$sep = '_';
-		if ( strpos($key, $sep . $this->prefix) !== 0 ) {
-			$key_base = func_get_args();
-			if ( !empty($key_base) ) {
-				$key = array_merge((array)$this->prefix, $key_base);
-				return $sep . implode($sep, $key);
-			}
+		$prefix = $sep . $this->prefix;
+		// Process unformatted keys only.
+		if ( strpos( $key, $prefix ) !== 0 ) {
+			$key = implode( $sep, array( $prefix, $key ) );
 		}
-		
+
 		return $key;
 	}
-	
+
 	/**
 	 * Retrieve class prefix (with separator if set)
+	 *
 	 * @param bool|string $sep Separator to append to class prefix (Default: no separator)
+	 *
 	 * @return string Class prefix
 	 */
-	function get_prefix($sep = false) {
-		$sep = ( is_string($sep) ) ? $sep : '';
-		$prefix = ( !empty($this->prefix) ) ? $this->prefix . $sep : '';
+	public function get_prefix( $sep = false ) {
+		$sep = ( is_string( $sep ) ) ? $sep : '';
+		$prefix = ( ! empty( $this->prefix ) ) ? $this->prefix . $sep : '';
 		return $prefix;
 	}
-	
+
 	/**
 	 * Prepend plugin prefix to some text
+	 *
 	 * @param string $text Text to add to prefix
 	 * @param string $sep Text used to separate prefix and text
+	 *
 	 * @return string Text with prefix prepended
 	 */
-	function add_prefix($text = '', $sep = '_') {
-		return $this->get_prefix($sep) . $text;
+	public function add_prefix( $text = '', $sep = '_' ) {
+		return $this->get_prefix( $sep ) . $text;
 	}
-	
+
 	/**
 	 * Creates a meta key for storing post meta data
 	 * Prefixes standard prefixed text with underscore to hide meta data on post edit forms
+	 *
 	 * @param string $text Text to use as base of meta key
+	 *
 	 * @return string Formatted meta key
 	 */
-	function make_meta_key($text = '') {
-		return '_' . $this->add_prefix($text);
+	public function make_meta_key( $text = '' ) {
+		return '_' . $this->add_prefix( $text );
 	}
-	
+
 	/**
-	 * Returns Database prefix for Cornerstone-related DB Tables
+	 * Returns Database prefix for plugin-related DB Tables
+	 *
 	 * @return string Database prefix
 	 */
-	function get_db_prefix() {
+	public function get_db_prefix() {
 		global $wpdb;
-		return $wpdb->prefix . $this->get_prefix('_');
+		return $wpdb->prefix . $this->get_prefix( '_' );
 	}
 }
